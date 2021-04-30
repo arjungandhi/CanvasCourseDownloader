@@ -1,4 +1,5 @@
 import os
+import sys
 
 import canvasapi.course, canvasapi.user, canvasapi.file
 
@@ -51,11 +52,21 @@ class Course:
 if __name__ == "__main__":
     import canvasapi
 
-    API_URL = "https://canvas.wpi.edu"
+    API_URL = os.getenv("CANVAS_API_URL", "NO_API_URL_SET")
     API_KEY = os.getenv("CANVAS_API_KEY", "NO_API_KEY_SET")
+    if API_URL == "NO_API_URL_SET":
+        print("Please set an API URL", file = sys.stderr)
+        sys.stderr.flush()
+        sys.exit(1)
+    elif API_KEY == "NO_API_KEY_SET":
+        print("Please set an API KEY", file = sys.stderr)
+        sys.stderr.flush()
+        sys.exit(2)
 
     canvas = canvasapi.Canvas(API_URL, API_KEY)
     user = canvas.get_current_user()
 
-    course = Course(canvas.get_course('10614'), user, canvas)
-    course.download()
+    courses = canvas.get_courses()
+    for course in courses:
+        c = Course(course, user, canvas)
+        c.download()

@@ -14,8 +14,8 @@ To run this program, you'll need to generate a personal API key in your user pro
 environment variables (example values below):
 
 ```
-API_URL="https://canvas.wpi.edu"
-API_KEY="7782~pu3VLqIb0SGVlQUhEtTlf0aWMVV02Y7WSCpWIZubhlNPRUtxsqWWOKxvVAuWICNh"
+CANVAS_API_URL="https://canvas.wpi.edu"
+CANVAS_API_KEY="7782~pu3VLqIb0SGVlQUhEtTlf0aWMVV02Y7WSCpWIZubhlNPRUtxsqWWOKxvVAuWICNh"
 ```
 
 ### Dependencies
@@ -32,6 +32,8 @@ TODO
 * Any modifications needed to be made to files/folders
 
 ### Executing program
+
+Program entrypoint is `course.py,' simplest usage should work with `python3 src/course.py` assuming environment variables are set.
 
 TODO
 * How to run the program
