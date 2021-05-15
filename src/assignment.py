@@ -81,6 +81,16 @@ class Assignment:
                 continue
 
             if "instructure_file_link" in link_class:
+                print(f"Trying to download file {link_href}, file ID: {link_href.split('/')[-2]}")
+                if link_href.find("/download") == -1:
+                    # In this case we need to add a "/download" between the ID and ?verifier= so that we get the correct format
+                    query_idx = link_href.find("?verifier")
+                    if query_idx == -1:
+                        print(f"Link was malformed and we couldn't recover: {link_href}")
+                        continue
+                    link_href = link_href[:query_idx] + "/download" + link_href[query_idx:]
+                    print(f"Recovered from malformed download link! New link: {link_href}")
+
                 link_file_id = int(link_href.split('/')[-2])  # Based on the standard download link format
                 print(f"Trying to download {link} as a Canvas file")
                 path = base_path + safe_name(link_file_id, link_name)
