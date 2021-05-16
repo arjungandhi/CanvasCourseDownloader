@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-import canvasapi.assignment, canvasapi.user, canvasapi.file
+import canvasapi.assignment, canvasapi.user, canvasapi.file, canvasapi.exceptions
 from bs4 import BeautifulSoup, Tag
 
 from src.util import safe_name
@@ -27,11 +27,13 @@ class Assignment:
             desc_links = desc_soup.find_all('a', href=True)  # type: List[Tag]
             for link in desc_links:
                 self.links.append(link.attrs)
-
-        self.submission = self.assignment.get_submission(self.user)
+        try:
+            self.submission = self.assignment.get_submission(self.user)
+        except canvasapi.exceptions.ResourceDoesNotExist:
+            self.submission = None
         self.files = None
         self.text = None
-        if not self.submission.missing:
+        if self.submission and not self.submission.missing:
             if not self.submission.submission_type:
                 print(f"Assignment submission has no submission type??")
             if self.submission.submission_type == "online_upload":

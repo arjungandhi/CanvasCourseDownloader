@@ -10,4 +10,5 @@ def safe_name(id: Union[str, int], unsafe_name: str) -> str:
     :param unsafe_name: Object name, possibly containing illegal characters
     :return: Safe version of the unsafe name with "{ID}_" prepended
     """
-    return f"{id}_{unsafe_name.lower().strip().replace(' ', '_').replace('/', '-').replace(':', '').replace('?', '')}"
+    replaced_name = unsafe_name.lower().strip().replace(' ', '_').replace('/', '-').replace(':', '').replace('?', '').replace('|','').replace('"', '').replace("'", '')
+    return f"{id}_{replaced_name if len(replaced_name) < 60 else replaced_name[:60]}"

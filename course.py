@@ -66,7 +66,21 @@ if __name__ == "__main__":
     canvas = canvasapi.Canvas(API_URL, API_KEY)
     user = canvas.get_current_user()
 
+    downloaded_courses = [int(f.name.split("_")[0]) for f in os.scandir("./downloads") if f.is_dir()]
+    print("Skipping the following courses since they're already downloaded:")
+    print(downloaded_courses)
+    print("Make sure to delete the folder if you want to retry download.")
+
+    skip_courses = []
+    print("Skipping the following courses since they're marked to skip:")
+    print(skip_courses)
+
     courses = canvas.get_courses()
     for course in courses:
-        c = Course(course, user, canvas)
-        c.download()
+        if course.id not in skip_courses and course.id not in downloaded_courses:
+            print(f"Preparing: {course}")
+            c = Course(course, user, canvas)
+            print(f"Downloading: {c.name}")
+            c.download()
+        else:
+            print(f"Skipping course {course.name} since its id {course.id} is in the skip list or already downloaded")

@@ -1,4 +1,5 @@
 import os
+import traceback
 from typing import List
 
 import canvasapi.module, canvasapi.course, canvasapi.file
@@ -74,7 +75,14 @@ class ModuleItem:
         if self.files:
             for file in self.files:
                 path = directory + safe_name(file.id, file.display_name)
-                file.download(path)
+                print(f"Downloading {path} from {file.url}")
+                try:
+                    file.download(path)
+                except UnicodeDecodeError:
+                    print(f"FAILED TO DOWNLOAD FILE: {file.url} due to UnicodeDecodeError")
+                except Exception as e:
+                    print(f"FAILED TO DOWNLOAD FILE: {file.url} due to {type(e)}")
+                    print(traceback.format_exc())
 
         if self.page_body:
             path = directory + safe_name(self.id, self.name) + ".html"
