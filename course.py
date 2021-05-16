@@ -1,5 +1,6 @@
 import os
 import sys
+import traceback
 
 import canvasapi.course, canvasapi.user, canvasapi.file
 
@@ -78,7 +79,13 @@ if __name__ == "__main__":
     courses = canvas.get_courses()
     for course in courses:
         if course.id not in skip_courses and course.id not in downloaded_courses:
-            print(f"Preparing: {course}")
+            try:
+                print(f"Preparing: {course}")
+            except AttributeError:
+                print(f"Received malformed data for course with id {course.id}; skipping!")
+                print(vars(course))
+                print(traceback.format_exc())
+                continue
             c = Course(course, user, canvas)
             print(f"Downloading: {c.name}")
             c.download()

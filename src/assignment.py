@@ -1,4 +1,5 @@
 import os
+import traceback
 from typing import List
 
 import canvasapi.assignment, canvasapi.user, canvasapi.file, canvasapi.exceptions
@@ -23,6 +24,7 @@ class Assignment:
         self.description = self.assignment.description
         self.links = []
         if self.description:
+            # TODO: Something about this is broken, since not all links in the HTML are found
             desc_soup = BeautifulSoup(self.assignment.description, "lxml")
             desc_links = desc_soup.find_all('a', href=True)  # type: List[Tag]
             for link in desc_links:
@@ -92,11 +94,20 @@ class Assignment:
                         continue
                     link_href = link_href[:query_idx] + "/download" + link_href[query_idx:]
                     print(f"Recovered from malformed download link! New link: {link_href}")
+                try:
+                    link_file_id = int(link_href.split('/')[-2])  # Based on the standard download link format
+                except ValueError:
+                    print(f"FAILED TO DOWNLOAD FILE: {link_href} due to malformed link file ID")
+                    print(traceback.format_exc())
+                    continue
 
-                link_file_id = int(link_href.split('/')[-2])  # Based on the standard download link format
                 print(f"Trying to download {link} as a Canvas file")
                 path = base_path + safe_name(link_file_id, link_name)
                 linkfile = canvasapi.file.File(self.assignment._requester, {"id": link_file_id, "display_name": "link_name", "url": link_href})
-                linkfile.download(path)
+                try:
+                    linkfile.download(path)
+                except canvasapi.exceptions.ResourceDoesNotExist:
+                    print(f"FAILED TO DOWNLOAD FILE: {link_href} since it could not be found")
+                    continue
             else:
                 print(f"Didn't try to download file from {link} since it wasn't a Canvas file")
