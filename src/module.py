@@ -84,6 +84,19 @@ class ModuleItem:
                     print(f"FAILED TO DOWNLOAD FILE: {file.url} due to {type(e)}")
                     print(traceback.format_exc())
 
+        if self.links: 
+            for link in self.links:
+                try:
+                    print(f'Downloading Attachment: {link.text}')
+                    filename = Path(directory+safe_name(self.id,self.name+'-'+link.text))
+                    url = link['href']
+                    response = requests.get(url)
+                    filename.write_bytes(response.content)
+                except Exception as e:
+                    print(f'Failed to Download Attachment: {link.text}')
+                    print(e)
+
+
         if self.page_body:
             path = directory + safe_name(self.id, self.name) + ".html"
             with open(path, 'w', encoding='utf-8', newline='\n') as item_file:
